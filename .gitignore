@@ -1,0 +1,12 @@
+out/
+/sdk/
+userdata/
+/shaderpack/
+/shader_coverage/
+/shaderdump/
+*.xex
+*.xexp
+*.log
+*.pdb
+*.rdc
+__pycache__/

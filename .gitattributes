@@ -1,0 +1,3 @@
+# Embedded shader bytecode (byte arrays)
+src/gpu/renderer_*_ps.h linguist-generated
+src/gpu/renderer_*_vs.h linguist-generated

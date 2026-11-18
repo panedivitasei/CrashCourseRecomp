@@ -1,0 +1,5 @@
+# Crash Course Recomp config.
+game_data_root = "../../../assets"
+update_data_root = "../../../assets/DCC1-TU"
+gpu_fps_cap = 60
+mnk_mode = true
