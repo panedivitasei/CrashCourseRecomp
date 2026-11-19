@@ -44,6 +44,7 @@
 
 #include "avatars/asset_pack.h"
 #include "avatars/closet.h"
+#include "avatars/item_cache.h"
 #include "avatars/custom_avatar.h"
 #include "avatars/guest_animation.h"
 #include "avatars/guest_asset.h"
@@ -842,6 +843,8 @@ u32 XamAvatarGetAssets_entry(ppc_ptr_t<X_AVATAR_METADATA> avatar_metadata_ptr,
                     sizeof(g_captured_metadata));
       }
     }
+    // Items this install lacks are downloaded first, for at most 3 s in all.
+    if (!random_npc) avatars::item_cache::Fetch(*metadata, 3000);
     // Every non-player build is dealt a random look from the full roster deck, and the incoming
     // manifest is matched against the shipped AI looks only for the log.
     avatars::X_AVATAR_METADATA ai_metadata;

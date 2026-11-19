@@ -7,6 +7,7 @@
  ******************************************************************************
  */
 
+#include <cstring>
 #include <filesystem>
 #include <stack>
 
@@ -129,6 +130,18 @@ static bool LoadAsset(AssetPack* asset_pack, const AssetId& asset_id,
       buffer = temp.data();
       size = temp.size();
       return true;
+    }
+    // Only zero-tail links go on to the pack, since any other id would pick an unrelated entry by its .b.
+    static const uint8_t kZeroTail[8] = {};
+    if (std::memcmp(asset_id.d, kZeroTail, sizeof(kZeroTail)) != 0) {
+      if (LoadFile(fmt::format("avatar_blobs\\{}.bin", asset_id.to_string()), temp)) {
+        buffer = temp.data();
+        size = temp.size();
+        return true;
+      }
+      REXKRNL_WARN("[avatar] item {} is in neither the closet nor the cache; the manifest fallback is used",
+                   asset_id.to_string());
+      return false;
     }
   }
   if (!asset_pack->GetAssetData(asset_id, buffer, size)) {
@@ -543,6 +556,36 @@ static void GetShaderOverrides(
     shader_parameter_override.z = 0.40392157f;
     shader_parameter_override.w = 1.6f;
     shader_parameter_overrides.push_back(shader_parameter_override);
+  }
+}
+
+// A closet item supplies CUSTOM_0..2 (usages 22-24) from its colour table (STRB block 7), overriding the white tint.
+static void AddItemColors(const AssetId& asset_id, std::vector<ShaderParameterOverride>& overrides) {
+  std::vector<uint8_t> bytes;
+  const uint8_t* table = nullptr;
+  size_t size = 0;
+  if (!GetCloset().ReadItemBytes(asset_id, bytes) ||
+      !strb::GetSTRBBlock(bytes.data(), bytes.size(), strb::STRBBlockId::kCustomColorTable, table, size) ||
+      size < 28) {
+    return;
+  }
+  // Version word (1) then three {ARGB colour, reserved} pairs; the version word gives the byte order.
+  const bool little = table[0] != 0;
+  auto word = [&](size_t at) {
+    const uint8_t* b = table + at;
+    return little ? uint32_t(b[0]) | uint32_t(b[1]) << 8 | uint32_t(b[2]) << 16 | uint32_t(b[3]) << 24
+                  : uint32_t(b[3]) | uint32_t(b[2]) << 8 | uint32_t(b[1]) << 16 | uint32_t(b[0]) << 24;
+  };
+  const uint32_t colors[3] = {word(4), word(12), word(20)};
+  if (!colors[0] && !colors[1] && !colors[2]) return;
+  for (uint32_t i = 0; i < 3; ++i) {
+    ShaderParameterOverride entry;
+    entry.usage = 22 + i;
+    entry.x = ((colors[i] >> 16) & 0xFF) / 255.f;
+    entry.y = ((colors[i] >> 8) & 0xFF) / 255.f;
+    entry.z = (colors[i] & 0xFF) / 255.f;
+    entry.w = ((colors[i] >> 24) & 0xFF) / 255.f;
+    overrides.push_back(entry);
   }
 }
 
@@ -964,6 +1007,10 @@ bool LoadAssetsToGuest(const X_AVATAR_METADATA& metadata,
       std::vector<ShaderParameterOverride> shader_parameter_overrides;
       GetShaderOverrides(metadata, effective_categories,
                          shader_parameter_overrides);
+      // Later overrides win, so the item colours replace the tint.
+      if (!is_custom && !IsStockPackId(source_component.first.asset_id)) {
+        AddItemColors(source_component.first.asset_id, shader_parameter_overrides);
+      }
 
       ModelToGuest(source_component.second, component_model, cpu_memory,
                    gpu_memory, effective_categories,

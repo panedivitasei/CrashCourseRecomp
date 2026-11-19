@@ -4,11 +4,13 @@
 // icon resource is also what Explorer/taskbar show for the exe.
 // The VERSIONINFO FileDescription is the display name Task Manager uses.
 
+#include "version.h"
+
 MAINICON ICON "icon.ico"
 
 1 VERSIONINFO
-FILEVERSION 1,0,0,0
-PRODUCTVERSION 1,0,0,0
+FILEVERSION CC1_VERSION_MAJOR,CC1_VERSION_MINOR,CC1_VERSION_PATCH,0
+PRODUCTVERSION CC1_VERSION_MAJOR,CC1_VERSION_MINOR,CC1_VERSION_PATCH,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -16,8 +18,8 @@ BEGIN
     BEGIN
       VALUE "FileDescription", "Crash Course 1"
       VALUE "ProductName", "Crash Course 1"
-      VALUE "FileVersion", "1.0.0.0"
-      VALUE "ProductVersion", "1.0.0.0"
+      VALUE "FileVersion", CC1_VERSION_TEXT
+      VALUE "ProductVersion", CC1_VERSION_TEXT
       VALUE "InternalName", "crashcourse1"
       VALUE "OriginalFilename", "crashcourse1.exe"
       VALUE "CompanyName", "ReXGlue recompilation"

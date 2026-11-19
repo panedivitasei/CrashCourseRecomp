@@ -37,6 +37,7 @@
 #include "online.h"
 #include "spectator.h"
 #include "settings.h"
+#include "version.h"
 
 REXCVAR_DEFINE_STRING(cc1_server_url, "https://cc1-server-yb4os3fhiq-ue.a.run.app", "CC1",
                       "The JMstudios CC1 server: Game Jolt sign-ins, friends for the Guide, and lobbies.");
@@ -150,7 +151,7 @@ class Crashcourse1App : public rex::ReXApp {
         rex::filesystem::GetUserFolder() / "JMstudios" / "userdata" / "JMlive";
     jmlive::Configure({.gamertag = rex::cvar::Query<std::string>("user_name"),
                        .server_url = REXCVAR_GET(cc1_server_url),
-                       .client_version = "1.0.0",  // ProductVersion in crashcourse1.rc
+                       .client_version = CC1_VERSION_TEXT,
                        .online = REXCVAR_GET(cc1_online)});
     rexglue_guide::Install(this, drawer,
                            {.title_name = "Crash Course",

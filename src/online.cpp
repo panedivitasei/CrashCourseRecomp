@@ -27,6 +27,7 @@
 #include "online/lobby_pose.h"
 #include "online/relay.h"
 #include "online_menu_lua.h"
+#include "version.h"
 
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -131,7 +132,7 @@ Reply Request(const wchar_t* verb, const std::string& path, const std::string& s
   if (!WinHttpCrackUrl(url.c_str(), 0, 0, &parts)) return reply;
 
   static const HINTERNET http =
-      WinHttpOpen(L"CrashCourse1/1.0", WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME,
+      WinHttpOpen(L"CrashCourse1/" CC1_VERSION_TEXT, WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY, WINHTTP_NO_PROXY_NAME,
                   WINHTTP_NO_PROXY_BYPASS, 0);
   const HINTERNET connection = http ? WinHttpConnect(http, host, parts.nPort, 0) : nullptr;
   const HINTERNET request =

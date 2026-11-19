@@ -2,6 +2,8 @@
 
 #include "closet.h"
 
+#include "item_cache.h"
+
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -110,7 +112,8 @@ const ClosetItem* Closet::Find(const AssetId& id) const {
 bool Closet::ReadItemBytes(const AssetId& id, std::vector<uint8_t>& out) const {
   const ClosetItem* item = Find(id);
   if (!item) {
-    return false;
+    // Another player's item may be in the download cache, which stays out of the closet.
+    return !IsStockPackId(id) && item_cache::Read(id, out);
   }
   const std::filesystem::path path = dir_ / (id.to_string() + ".bin");
   FILE* f = std::fopen(path.string().c_str(), "rb");
