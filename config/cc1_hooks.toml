@@ -1,0 +1,76 @@
+# Hooks at a function entry are absent from this file because
+# src/guest_hooks.cpp replaces those functions with REX_HOOK_RAW and calls the
+# recompiled body.
+
+# CC1_SkipDemoFence follows the chicken-out action-state query (action 35,
+# "press RB to skip ahead") in sub_829AB7C0 and gates the branch on the
+# physical RB button under cvar cc1_fix_chickenout.
+[[midasm_hook]]
+address = 0x829AB900
+name = "CC1_SkipDemoFence"
+# The hook reads r31, the FIGHTER, from the live context.
+registers = []
+
+[[midasm_hook]]
+address = 0x828BAF34
+name = "CC1_StartTexRenderFailA"
+registers = []
+
+[[midasm_hook]]
+address = 0x828BAF74
+name = "CC1_StartTexRenderFailB"
+registers = []
+
+[[midasm_hook]]
+address = 0x828BAFA8
+name = "CC1_StartTexRenderFailC"
+registers = []
+
+[[midasm_hook]]
+address = 0x82969380
+name = "CC1_RenderPassedProbe"
+registers = []
+
+# CC1_PassLoopTop and CC1_PassGateVerdict sit inside TU1 ProcessRendering at
+# the pass-loop top (r31 = RENDERPASS) and at the callback pre-gate return
+# check (r3 = verdict).
+[[midasm_hook]]
+address = 0x82968C14
+name = "CC1_PassLoopTop"
+registers = []
+
+[[midasm_hook]]
+address = 0x82968CE8
+name = "CC1_PassGateVerdict"
+registers = []
+
+# CC1_ShadowGateProbe sits at the kind compare of TU1 SCENEXA::RenderShadowMaps
+# (0x828B9298, renderer vtbl+564), where r3 holds the RTT texture type.
+[[midasm_hook]]
+address = 0x828b9410
+name = "CC1_ShadowGateProbe"
+registers = []
+
+# CC1_UnlinkGuard (probe.cpp) keeps the render-object bucket remove in
+# sub_82269450 from unlinking a node with null links, a fault on course exit.
+[[midasm_hook]]
+address = 0x82269778
+name = "CC1_UnlinkGuard"
+registers = []
+
+# CC1_Shadow{Begin,CasterDraw,End}Probe (probe.cpp) sit at the begin-RTT,
+# caster draw and end-RTT points of the shadow driver.
+[[midasm_hook]]
+address = 0x828b9500
+name = "CC1_ShadowBeginProbe"
+registers = []
+
+[[midasm_hook]]
+address = 0x828b95fc
+name = "CC1_ShadowCasterDrawProbe"
+registers = []
+
+[[midasm_hook]]
+address = 0x828b961c
+name = "CC1_ShadowEndProbe"
+registers = []
